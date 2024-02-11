@@ -6,10 +6,17 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface BookmarkManager : NSObject
+
++ (instancetype)sharedManager;
+
+- (NSString *)getCustomPrefsFilePath;
+- (void)ensureSSHBookmarkAvailableAndExecuteBlock:(void (^)(NSURL *bookmarkURL))block;
+
 
 @end
 
