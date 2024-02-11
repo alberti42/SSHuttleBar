@@ -3,27 +3,30 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		654D6E982B7949F00078AE2B /* SSHuttleBar.icns in Resources */ = {isa = PBXBuildFile; fileRef = 654D6E972B7949F00078AE2B /* SSHuttleBar.icns */; };
 		6575B52C2B78BA8E00F5206F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6575B52B2B78BA8E00F5206F /* AppDelegate.m */; };
-		6575B52E2B78BA9000F5206F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6575B52D2B78BA9000F5206F /* Assets.xcassets */; };
 		6575B5312B78BA9000F5206F /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6575B52F2B78BA9000F5206F /* MainMenu.xib */; };
 		6575B5332B78BA9000F5206F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6575B5322B78BA9000F5206F /* main.m */; };
-		65BD5A402B790FBC009A6A49 /* CustomStatusBarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BD5A3F2B790FBC009A6A49 /* CustomStatusBarButton.m */; };
+		65B62C132B794E0B00AD6549 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65B62C122B794E0B00AD6549 /* Media.xcassets */; };
+		65B62C162B79588500AD6549 /* CustomStatusBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 65B62C152B79588500AD6549 /* CustomStatusBarView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		654D6E972B7949F00078AE2B /* SSHuttleBar.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = SSHuttleBar.icns; sourceTree = "<group>"; };
+		654D6E992B794A570078AE2B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		6575B5272B78BA8E00F5206F /* SSHuttleBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SSHuttleBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6575B52A2B78BA8E00F5206F /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		6575B52B2B78BA8E00F5206F /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		6575B52D2B78BA9000F5206F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6575B5302B78BA9000F5206F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		6575B5322B78BA9000F5206F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6575B5342B78BA9000F5206F /* SSHuttleBar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SSHuttleBar.entitlements; sourceTree = "<group>"; };
-		65BD5A3E2B790FBC009A6A49 /* CustomStatusBarButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomStatusBarButton.h; sourceTree = "<group>"; };
-		65BD5A3F2B790FBC009A6A49 /* CustomStatusBarButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomStatusBarButton.m; sourceTree = "<group>"; };
+		65B62C122B794E0B00AD6549 /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
+		65B62C142B79588500AD6549 /* CustomStatusBarView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomStatusBarView.h; sourceTree = "<group>"; };
+		65B62C152B79588500AD6549 /* CustomStatusBarView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomStatusBarView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,14 +59,16 @@
 		6575B5292B78BA8E00F5206F /* SSHuttleBar */ = {
 			isa = PBXGroup;
 			children = (
+				65B62C142B79588500AD6549 /* CustomStatusBarView.h */,
+				65B62C152B79588500AD6549 /* CustomStatusBarView.m */,
+				654D6E992B794A570078AE2B /* Info.plist */,
 				6575B52A2B78BA8E00F5206F /* AppDelegate.h */,
 				6575B52B2B78BA8E00F5206F /* AppDelegate.m */,
-				65BD5A3E2B790FBC009A6A49 /* CustomStatusBarButton.h */,
-				65BD5A3F2B790FBC009A6A49 /* CustomStatusBarButton.m */,
-				6575B52D2B78BA9000F5206F /* Assets.xcassets */,
 				6575B52F2B78BA9000F5206F /* MainMenu.xib */,
 				6575B5322B78BA9000F5206F /* main.m */,
 				6575B5342B78BA9000F5206F /* SSHuttleBar.entitlements */,
+				654D6E972B7949F00078AE2B /* SSHuttleBar.icns */,
+				65B62C122B794E0B00AD6549 /* Media.xcassets */,
 			);
 			path = SSHuttleBar;
 			sourceTree = "<group>";
@@ -103,7 +108,7 @@
 				};
 			};
 			buildConfigurationList = 6575B5222B78BA8E00F5206F /* Build configuration list for PBXProject "SSHuttleBar" */;
-			compatibilityVersion = "Xcode 14.0";
+			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -125,7 +130,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6575B52E2B78BA9000F5206F /* Assets.xcassets in Resources */,
+				654D6E982B7949F00078AE2B /* SSHuttleBar.icns in Resources */,
+				65B62C132B794E0B00AD6549 /* Media.xcassets in Resources */,
 				6575B5312B78BA9000F5206F /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -137,8 +143,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65B62C162B79588500AD6549 /* CustomStatusBarView.m in Sources */,
 				6575B5332B78BA9000F5206F /* main.m in Sources */,
-				65BD5A402B790FBC009A6A49 /* CustomStatusBarButton.m in Sources */,
 				6575B52C2B78BA8E00F5206F /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -277,13 +283,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = SSHuttleBar/SSHuttleBar.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9V3X7C8VCK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SSHuttleBar/Info.plist;
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainNibFile = MainMenu;
@@ -304,13 +313,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = SSHuttleBar/SSHuttleBar.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9V3X7C8VCK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SSHuttleBar/Info.plist;
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainNibFile = MainMenu;
