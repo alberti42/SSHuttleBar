@@ -86,7 +86,7 @@
     [openPanel setMessage:@"Please grant access to your .ssh directory."];
     
     // Set the initial directory to /Users/andrea/.ssh
-    NSURL *initialDirectoryURL = [NSURL fileURLWithPath:theFilePath]; // IMPORTANT: theFilePath is a variable containing the standard file path
+    NSURL *initialDirectoryURL = [NSURL fileURLWithPath:@"/Users/andrea/.ssh/config"];
     [openPanel setDirectoryURL:initialDirectoryURL];
     
     [openPanel beginWithCompletionHandler:^(NSInteger result) {

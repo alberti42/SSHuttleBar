@@ -11,7 +11,7 @@
 		6575B52E2B78BA9000F5206F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6575B52D2B78BA9000F5206F /* Assets.xcassets */; };
 		6575B5312B78BA9000F5206F /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6575B52F2B78BA9000F5206F /* MainMenu.xib */; };
 		6575B5332B78BA9000F5206F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6575B5322B78BA9000F5206F /* main.m */; };
-		6575B53E2B78E58200F5206F /* BookmarkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6575B53D2B78E58200F5206F /* BookmarkManager.m */; };
+		65BD5A402B790FBC009A6A49 /* CustomStatusBarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BD5A3F2B790FBC009A6A49 /* CustomStatusBarButton.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +24,8 @@
 		6575B5342B78BA9000F5206F /* SSHuttleBar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SSHuttleBar.entitlements; sourceTree = "<group>"; };
 		6575B53C2B78E58200F5206F /* BookmarkManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BookmarkManager.h; sourceTree = "<group>"; };
 		6575B53D2B78E58200F5206F /* BookmarkManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BookmarkManager.m; sourceTree = "<group>"; };
+		65BD5A3E2B790FBC009A6A49 /* CustomStatusBarButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomStatusBarButton.h; sourceTree = "<group>"; };
+		65BD5A3F2B790FBC009A6A49 /* CustomStatusBarButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomStatusBarButton.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,14 +58,16 @@
 		6575B5292B78BA8E00F5206F /* SSHuttleBar */ = {
 			isa = PBXGroup;
 			children = (
-				6575B53C2B78E58200F5206F /* BookmarkManager.h */,
-				6575B53D2B78E58200F5206F /* BookmarkManager.m */,
 				6575B52A2B78BA8E00F5206F /* AppDelegate.h */,
 				6575B52B2B78BA8E00F5206F /* AppDelegate.m */,
+				65BD5A3E2B790FBC009A6A49 /* CustomStatusBarButton.h */,
+				65BD5A3F2B790FBC009A6A49 /* CustomStatusBarButton.m */,
 				6575B52D2B78BA9000F5206F /* Assets.xcassets */,
 				6575B52F2B78BA9000F5206F /* MainMenu.xib */,
 				6575B5322B78BA9000F5206F /* main.m */,
 				6575B5342B78BA9000F5206F /* SSHuttleBar.entitlements */,
+				6575B53C2B78E58200F5206F /* BookmarkManager.h */,
+				6575B53D2B78E58200F5206F /* BookmarkManager.m */,
 			);
 			path = SSHuttleBar;
 			sourceTree = "<group>";
@@ -137,8 +141,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6575B53E2B78E58200F5206F /* BookmarkManager.m in Sources */,
 				6575B5332B78BA9000F5206F /* main.m in Sources */,
+				65BD5A402B790FBC009A6A49 /* CustomStatusBarButton.m in Sources */,
 				6575B52C2B78BA8E00F5206F /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -284,6 +288,7 @@
 				DEVELOPMENT_TEAM = 9V3X7C8VCK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainNibFile = MainMenu;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
@@ -310,6 +315,7 @@
 				DEVELOPMENT_TEAM = 9V3X7C8VCK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainNibFile = MainMenu;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
