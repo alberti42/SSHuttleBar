@@ -22,8 +22,6 @@
 		6575B5302B78BA9000F5206F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		6575B5322B78BA9000F5206F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6575B5342B78BA9000F5206F /* SSHuttleBar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SSHuttleBar.entitlements; sourceTree = "<group>"; };
-		6575B53C2B78E58200F5206F /* BookmarkManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BookmarkManager.h; sourceTree = "<group>"; };
-		6575B53D2B78E58200F5206F /* BookmarkManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BookmarkManager.m; sourceTree = "<group>"; };
 		65BD5A3E2B790FBC009A6A49 /* CustomStatusBarButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomStatusBarButton.h; sourceTree = "<group>"; };
 		65BD5A3F2B790FBC009A6A49 /* CustomStatusBarButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomStatusBarButton.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -66,8 +64,6 @@
 				6575B52F2B78BA9000F5206F /* MainMenu.xib */,
 				6575B5322B78BA9000F5206F /* main.m */,
 				6575B5342B78BA9000F5206F /* SSHuttleBar.entitlements */,
-				6575B53C2B78E58200F5206F /* BookmarkManager.h */,
-				6575B53D2B78E58200F5206F /* BookmarkManager.m */,
 			);
 			path = SSHuttleBar;
 			sourceTree = "<group>";
