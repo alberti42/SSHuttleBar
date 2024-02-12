@@ -24,6 +24,10 @@
 		65B62C122B794E0B00AD6549 /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
 		65B62C142B79588500AD6549 /* CustomStatusBarView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomStatusBarView.h; sourceTree = "<group>"; };
 		65B62C152B79588500AD6549 /* CustomStatusBarView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomStatusBarView.m; sourceTree = "<group>"; };
+		65BB28A92B7A06CA0083DAF9 /* SSHuttleBar-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "SSHuttleBar-icon.png"; sourceTree = "<group>"; };
+		65BB28AA2B7A06CA0083DAF9 /* SSHuttleBar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SSHuttleBar.png; sourceTree = "<group>"; };
+		65BB28AB2B7A06CA0083DAF9 /* SSHuttleBar-icon.psd */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SSHuttleBar-icon.psd"; sourceTree = "<group>"; };
+		65BB28AC2B7A06CA0083DAF9 /* IconSSHuttleBar.ai */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = IconSSHuttleBar.ai; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +60,7 @@
 		6575B5292B78BA8E00F5206F /* SSHuttleBar */ = {
 			isa = PBXGroup;
 			children = (
+				65BB28A82B7A06B10083DAF9 /* Graphics */,
 				65B62C142B79588500AD6549 /* CustomStatusBarView.h */,
 				65B62C152B79588500AD6549 /* CustomStatusBarView.m */,
 				6575B52A2B78BA8E00F5206F /* AppDelegate.h */,
@@ -66,6 +71,17 @@
 				65B62C122B794E0B00AD6549 /* Media.xcassets */,
 			);
 			path = SSHuttleBar;
+			sourceTree = "<group>";
+		};
+		65BB28A82B7A06B10083DAF9 /* Graphics */ = {
+			isa = PBXGroup;
+			children = (
+				65BB28AC2B7A06CA0083DAF9 /* IconSSHuttleBar.ai */,
+				65BB28A92B7A06CA0083DAF9 /* SSHuttleBar-icon.png */,
+				65BB28AB2B7A06CA0083DAF9 /* SSHuttleBar-icon.psd */,
+				65BB28AA2B7A06CA0083DAF9 /* SSHuttleBar.png */,
+			);
+			path = Graphics;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

@@ -10,6 +10,9 @@
 #import "AppDelegate.h"
 #import "CustomStatusBarView.h"
 
+#define NUM_SECONDS_BETWEEN_REPS 1
+// #define DEBUG_OUTPUT_PROCESSES 0
+
 static const int NoConnection = -1;
 static const int SshConnection = 0;
 static const int DirectConnection = 1;
@@ -20,43 +23,29 @@ static const int DirectConnection = 1;
 @property (strong, nonatomic) NSTask *sshuttleTask;
 @property (assign, nonatomic) BOOL isSSHconnected;
 @property (assign, nonatomic) BOOL isSSHuttleConnected;
-@property (strong, nonatomic) NSString *connectedIcon;
-@property (strong, nonatomic) NSString *disconnectedIcon;
+@property (strong, nonatomic) NSImage *connectedIcon;
+@property (strong, nonatomic) NSImage *disconnectedIcon;
 @property (strong, nonatomic) NSURL *bookmarkURL; // Property to store the bookmark URL
 @property (assign, nonatomic) BOOL autorestartSSHuttle;
 @property (assign, nonatomic) BOOL autorestartSSH;
 @property (strong, nonatomic) NSLock *lock;
 @property (strong, nonatomic) dispatch_semaphore_t finishedThreadCycled;
 @property (assign, nonatomic) BOOL connectAfterLaunch;
-@property (assign, nonatomic) NSNumber *connType;
-@property (assign, nonatomic) NSMenuItem* item_ssh;
-@property (assign, nonatomic) NSMenuItem* item_direct;
-@property (assign, nonatomic) NSString* sshuttle_path;
-@property (assign, nonatomic) NSString* ssh_path;
+@property (assign, nonatomic) int connType;
+@property (assign, nonatomic) NSMenuItem* menu_item_ssh_conn;
+@property (assign, nonatomic) NSMenuItem* menu_item_direct_conn;
+@property (assign, nonatomic) NSString* path_sshuttle;
+@property (assign, nonatomic) NSString* path_ssh;
 @end
 
 @implementation AppDelegate
 
 - (NSString *)getCustomPrefsFilePath {
-    NSString *appSupportDirectory = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES).firstObject;
+    NSString *appPreferencesDirectory = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).firstObject  stringByAppendingPathComponent:@"Preferences"];
     NSString *appName = [[NSBundle mainBundle] bundleIdentifier]; // Dynamically get your app's bundle identifier
     
-    // Ensure there's a specific directory for your app's preferences within Application Support
-    NSString *appSpecificPrefsDirectory = [appSupportDirectory stringByAppendingPathComponent:appName];
-    
-    // Check if directory exists, if not, create it
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    if (![fileManager fileExistsAtPath:appSpecificPrefsDirectory]) {
-        NSError *error = nil;
-        [fileManager createDirectoryAtPath:appSpecificPrefsDirectory withIntermediateDirectories:YES attributes:nil error:&error];
-        if (error) {
-            NSLog(@"SSHuttleBar: Error creating app-specific preferences directory: %@", error.localizedDescription);
-            return nil; // Handle the error appropriately
-        }
-    }
-    
     // Append the custom preferences file name
-    NSString *prefsFilePath = [appSpecificPrefsDirectory stringByAppendingPathComponent:@"org.Alberti42.SSHuttleBar.plist"];
+    NSString *prefsFilePath = [[appPreferencesDirectory stringByAppendingPathComponent:appName] stringByAppendingPathExtension:@"plist"];
     return prefsFilePath;
 }
 
@@ -87,18 +76,22 @@ static const int DirectConnection = 1;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     
-    self.ssh_path = [AppDelegate find_path_executables:@[@"/opt/homebrew/bin/ssh", @"/usr/local/bin/ssh", @"/usr/bin/ssh"] withLabel:@"sshuttle"];
-    self.sshuttle_path = [AppDelegate find_path_executables:@[@"/opt/homebrew/bin/sshuttle", @"/usr/local/bin/sshuttle"] withLabel:@"ssh"];
+    self.path_ssh = [AppDelegate find_path_executables:@[@"/opt/homebrew/bin/ssh", @"/usr/local/bin/ssh", @"/usr/bin/ssh"] withLabel:@"sshuttle"];
+    self.path_sshuttle = [AppDelegate find_path_executables:@[@"/opt/homebrew/bin/sshuttle", @"/usr/local/bin/sshuttle"] withLabel:@"ssh"];
     
     NSString *prefsFilePath = [self getCustomPrefsFilePath];
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:prefsFilePath];
-    [self setConnectAfterLaunch:[([prefs objectForKey:@"connectAfterLaunch"] ? : @0) boolValue]];
-    [self setConnType:[prefs objectForKey:@"connectType"] ? : @-1];
+    self.connectAfterLaunch = [([prefs objectForKey:@"connectAfterLaunch"] ? : @NO) boolValue];
+    self.connType = [([prefs objectForKey:@"connectType"] ? : [NSNumber numberWithInt:NoConnection]) intValue];
     
     self.lock = [[NSLock alloc] init];
     
-    self.connectedIcon = @"⚡️"; // Connected state icon
-    self.disconnectedIcon = @"❌"; // Disconnected state icon
+    //self.connectedIcon = @"⚡️"; // Connected state icon
+    //self.disconnectedIcon = @"❌"; // Disconnected state icon
+
+    // Load the icons from the asset catalog
+    self.connectedIcon = [NSImage imageNamed:@"ConnectedIcon"];
+    self.disconnectedIcon = [NSImage imageNamed:@"DisconnectedIcon"];
     
     // Initialize your status item here as before
     self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
@@ -106,7 +99,7 @@ static const int DirectConnection = 1;
     self.statusItem.button.target = self;
     
     // Set the initial icon
-    self.statusItem.button.title = self.disconnectedIcon;
+    [self updateConnectionStatus];
     
     // Setup the right-click menu
     [self setupStatusItemMenu];
@@ -119,7 +112,7 @@ static const int DirectConnection = 1;
 }
 
 - (void)start_processes{
-    switch([[self connType] intValue]){
+    switch([self connType]){
         case 0:
             [self startSSHProcess];
             NSLog(@"SSHuttleBar: Connected to the ssh process (PID=%d)", [[self sshTask] processIdentifier]);
@@ -132,16 +125,16 @@ static const int DirectConnection = 1;
 - (void)setupStatusItemMenu {
     NSMenu *menu = [[NSMenu alloc] init];
     
-    [self setItem_ssh:[menu addItemWithTitle:@"Connect through SSH" action:@selector(selectSSHconnect:) keyEquivalent:@"0"]];
-    [self setItem_direct:[menu addItemWithTitle:@"Connect directly" action:@selector(selectDirectConnect:) keyEquivalent:@"1"]];
+    self.menu_item_ssh_conn = [menu addItemWithTitle:@"Connect through SSH" action:@selector(selectSSHconnect:) keyEquivalent:@"0"];
+    self.menu_item_direct_conn = [menu addItemWithTitle:@"Connect directly" action:@selector(selectDirectConnect:) keyEquivalent:@"1"];
     
-    switch([[self connType] intValue])
+    switch([self connType])
     {
         case 0:
-            [[self item_ssh] setState:YES];
+            [[self menu_item_ssh_conn] setState:YES];
             break;
         case 1:
-            [[self item_direct] setState:YES];
+            [[self menu_item_direct_conn] setState:YES];
             break;
     }
     
@@ -161,8 +154,8 @@ static const int DirectConnection = 1;
 
 - (void) selectSSHconnect:(NSMenuItem*)menuItem {
     
-    BOOL current_status_ssh = [[self item_ssh] state];
-    BOOL current_status_direct = [[self item_direct] state];
+    BOOL current_status_ssh = [[self menu_item_ssh_conn] state];
+    BOOL current_status_direct = [[self menu_item_direct_conn] state];
     
     if( current_status_ssh || current_status_direct)
     {
@@ -170,21 +163,21 @@ static const int DirectConnection = 1;
     }
     
     if(!current_status_ssh){
-        [self setConnType:@0];
+        [self setConnType:SshConnection];
         [self start_processes];
     }
     else{
-        [self setConnType:@-1];
+        [self setConnType:NoConnection];
     }
     
-    [[self item_ssh] setState:!current_status_ssh];
-    [[self item_direct] setState:NO];
+    [[self menu_item_ssh_conn] setState:!current_status_ssh];
+    [[self menu_item_direct_conn] setState:NO];
     
     NSString *prefsFilePath = [self getCustomPrefsFilePath];
     NSMutableDictionary *prefs = [NSMutableDictionary dictionaryWithContentsOfFile:prefsFilePath] ?: [NSMutableDictionary dictionary];
     
     // Update the connectAfterLaunch field in the dictionary
-    prefs[@"connectType"] = [self connType];
+    prefs[@"connectType"] = [NSNumber numberWithInt:[self connType]];
     
     // Write the updated dictionary back to the preferences file
     BOOL success = [prefs writeToFile:prefsFilePath atomically:YES];
@@ -194,30 +187,30 @@ static const int DirectConnection = 1;
 }
 
 - (void) selectDirectConnect:(NSMenuItem*)menuItem {
-    BOOL current_status_ssh = [[self item_ssh] state];
-    BOOL current_status_direct = [[self item_direct] state];
+    BOOL current_status_ssh = [[self menu_item_ssh_conn] state];
+    BOOL current_status_direct = [[self menu_item_direct_conn] state];
     
     if( current_status_ssh || current_status_direct)
     {
         [self terminate_processes];
     }
-        
+    
     if(!current_status_direct){
-        [self setConnType:@1];
+        [self setConnType:DirectConnection];
         [self start_processes];
     }
     else{
-        [self setConnType:@-1];
+        [self setConnType:NoConnection];
     }
     
-    [[self item_ssh] setState:NO];
-    [[self item_direct] setState:!current_status_direct];
-        
+    [[self menu_item_ssh_conn] setState:NO];
+    [[self menu_item_direct_conn] setState:!current_status_direct];
+    
     NSString *prefsFilePath = [self getCustomPrefsFilePath];
     NSMutableDictionary *prefs = [NSMutableDictionary dictionaryWithContentsOfFile:prefsFilePath] ?: [NSMutableDictionary dictionary];
     
     // Update the connectAfterLaunch field in the dictionary
-    prefs[@"connectType"] = [self connType];
+    prefs[@"connectType"] = [NSNumber numberWithInt:[self connType]];
     
     // Write the updated dictionary back to the preferences file
     BOOL success = [prefs writeToFile:prefsFilePath atomically:YES];
@@ -248,14 +241,16 @@ static const int DirectConnection = 1;
 - (void)startSSHProcess {
     self.autorestartSSH = YES;
     self.sshTask = [[NSTask alloc] init];
-    [self.sshTask setLaunchPath:[self ssh_path]];
+    [self.sshTask setLaunchPath:[self path_ssh]];
     [self.sshTask setArguments:@[@"-N", @"-L", @"8022:localhost:8022", @"-i", [@"~/.ssh/id_computing-server_bonn" stringByExpandingTildeInPath], @"computing-server2.iap.uni-bonn.de"]];
     
+#ifndef DEBUG_OUTPUT_PROCESSES
     // Redirect output and error to /dev/null
     NSFileHandle *nullFileHandle = [NSFileHandle fileHandleWithNullDevice];
     [self.sshTask setStandardOutput:nullFileHandle];
     [self.sshTask setStandardError:nullFileHandle];
-
+#endif
+    
     // Handle ssh task termination
     __weak typeof(self) weakSelf = self;
     
@@ -268,7 +263,7 @@ static const int DirectConnection = 1;
             
             if ([strongSelf1 autorestartSSH]) {
                 // Wait for 1 second before trying to restart the SSH process
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(NUM_SECONDS_BETWEEN_REPS * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     __strong typeof(weakSelf) strongSelf2 = weakSelf;
                     [strongSelf2 setAutorestartSSHuttle:NO];
                     [strongSelf2 terminateSSHuttleProcess];
@@ -283,17 +278,17 @@ static const int DirectConnection = 1;
             };
         });
     }];
-
+    
     // Start the ssh process
     [self.sshTask launch];
-    self.statusItem.button.title = self.connectedIcon;
+    self.statusItem.button.image = self.connectedIcon;
 }
 
 - (void)startSSHuttleProcess {
     self.autorestartSSHuttle = YES;
     self.sshuttleTask = [[NSTask alloc] init];
-    [self.sshuttleTask setLaunchPath:[self sshuttle_path]];
-    switch ([[self connType] intValue]) {
+    [self.sshuttleTask setLaunchPath:[self path_sshuttle]];
+    switch ([self connType]) {
         case 0:
             [self.sshuttleTask setArguments:@[@"-r", @"m1-gateway", @"--dns", @"0/0"]];
             break;
@@ -302,10 +297,12 @@ static const int DirectConnection = 1;
             break;
     }
     
+#ifndef DEBUG_OUTPUT_PROCESSES
     // Redirect output and error to /dev/null
     NSFileHandle *nullFileHandle = [NSFileHandle fileHandleWithNullDevice];
     [self.sshuttleTask setStandardOutput:nullFileHandle];
     [self.sshuttleTask setStandardError:nullFileHandle];
+#endif
     
     // Handle ssh task termination
     __weak typeof(self) weakSelf = self;
@@ -317,7 +314,7 @@ static const int DirectConnection = 1;
             [strongSelf1 updateConnectionStatus];
             
             BOOL relaunch = false;
-            if([[self connType] intValue] == 1){
+            if([self connType] == 1){
                 relaunch = true;
             }
             [strongSelf1.lock lock];
@@ -327,7 +324,7 @@ static const int DirectConnection = 1;
             [strongSelf1.lock unlock];
             if (relaunch && [strongSelf1 autorestartSSHuttle]) {
                 // Wait for 1 second before trying to restart the SSH process
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(NUM_SECONDS_BETWEEN_REPS * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     __strong typeof(weakSelf) strongSelf2 = weakSelf;
                     [strongSelf2 startSSHuttleProcess];
                     NSLog(@"SSHuttleBar: Reconnected to the sshuttle process (PID=%d)", [[strongSelf2 sshTask] processIdentifier]);
@@ -339,7 +336,7 @@ static const int DirectConnection = 1;
     
     // Start the ssh process
     [self.sshuttleTask launch];
-    self.statusItem.button.title = self.connectedIcon;
+    self.statusItem.button.image = self.connectedIcon;
 }
 
 - (void)terminateSSHprocess {
@@ -365,12 +362,12 @@ static const int DirectConnection = 1;
 }
 
 - (void)updateConnectionStatus {
-    BOOL connected = [self isSSHuttleConnected] && ([self isSSHconnected] || ([[self connType] intValue] == 1));
+    BOOL connected = [self isSSHuttleConnected] && ([self isSSHconnected] || ([self connType] == 1));
     
     if (connected) {
-        self.statusItem.button.title = self.connectedIcon; // Connected icon
+        self.statusItem.button.image = self.connectedIcon; // Connected icon
     } else {
-        self.statusItem.button.title = self.disconnectedIcon; // DisSSHconnected icon
+        self.statusItem.button.image = self.disconnectedIcon; // DisSSHconnected icon
     }
 }
 
