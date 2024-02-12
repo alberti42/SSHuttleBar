@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		654D6E982B7949F00078AE2B /* SSHuttleBar.icns in Resources */ = {isa = PBXBuildFile; fileRef = 654D6E972B7949F00078AE2B /* SSHuttleBar.icns */; };
 		6575B52C2B78BA8E00F5206F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6575B52B2B78BA8E00F5206F /* AppDelegate.m */; };
 		6575B5312B78BA9000F5206F /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6575B52F2B78BA9000F5206F /* MainMenu.xib */; };
 		6575B5332B78BA9000F5206F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6575B5322B78BA9000F5206F /* main.m */; };
@@ -16,8 +15,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		654D6E972B7949F00078AE2B /* SSHuttleBar.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = SSHuttleBar.icns; sourceTree = "<group>"; };
-		654D6E992B794A570078AE2B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		6575B5272B78BA8E00F5206F /* SSHuttleBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SSHuttleBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6575B52A2B78BA8E00F5206F /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		6575B52B2B78BA8E00F5206F /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -61,13 +58,11 @@
 			children = (
 				65B62C142B79588500AD6549 /* CustomStatusBarView.h */,
 				65B62C152B79588500AD6549 /* CustomStatusBarView.m */,
-				654D6E992B794A570078AE2B /* Info.plist */,
 				6575B52A2B78BA8E00F5206F /* AppDelegate.h */,
 				6575B52B2B78BA8E00F5206F /* AppDelegate.m */,
 				6575B52F2B78BA9000F5206F /* MainMenu.xib */,
 				6575B5322B78BA9000F5206F /* main.m */,
 				6575B5342B78BA9000F5206F /* SSHuttleBar.entitlements */,
-				654D6E972B7949F00078AE2B /* SSHuttleBar.icns */,
 				65B62C122B794E0B00AD6549 /* Media.xcassets */,
 			);
 			path = SSHuttleBar;
@@ -130,7 +125,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				654D6E982B7949F00078AE2B /* SSHuttleBar.icns in Resources */,
 				65B62C132B794E0B00AD6549 /* Media.xcassets in Resources */,
 				6575B5312B78BA9000F5206F /* MainMenu.xib in Resources */,
 			);
@@ -293,7 +287,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SSHuttleBar/Info.plist;
-				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_LSUIElement = NO;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainNibFile = MainMenu;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
@@ -323,7 +317,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SSHuttleBar/Info.plist;
-				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_LSUIElement = NO;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainNibFile = MainMenu;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
