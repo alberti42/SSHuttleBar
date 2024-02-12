@@ -5,9 +5,14 @@
 //  Created by Andrea Alberti on 11.02.24.
 //
 
+
 //#import "BookmarkManager.h"
 #import "AppDelegate.h"
 #import "CustomStatusBarView.h"
+
+static const int NoConnection = -1;
+static const int SshConnection = 0;
+static const int DirectConnection = 1;
 
 @interface AppDelegate ()
 @property (strong, nonatomic) NSStatusItem *statusItem;
@@ -26,6 +31,8 @@
 @property (assign, nonatomic) NSNumber *connType;
 @property (assign, nonatomic) NSMenuItem* item_ssh;
 @property (assign, nonatomic) NSMenuItem* item_direct;
+@property (assign, nonatomic) NSString* sshuttle_path;
+@property (assign, nonatomic) NSString* ssh_path;
 @end
 
 @implementation AppDelegate
@@ -53,6 +60,21 @@
     return prefsFilePath;
 }
 
++ (NSString *)find_path_executables:(NSArray<NSString *> *)possiblePaths withLabel:(NSString*) label {
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+    for (NSString *path in possiblePaths) {
+        if ([fileManager fileExistsAtPath:path]) {
+            NSLog(@"Found %@ executable at: %@", label, path);
+            return path;
+        }
+    }
+    
+    NSLog(@"%@ executable not found in any of the specified locations.",label);
+    return nil;
+}
+
 - (void)terminate_processes {
     [self terminateSSHuttleProcess];
     [self terminateSSHprocess];
@@ -64,6 +86,9 @@
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+    
+    self.ssh_path = [AppDelegate find_path_executables:@[@"/opt/homebrew/bin/ssh", @"/usr/local/bin/ssh", @"/usr/bin/ssh"] withLabel:@"sshuttle"];
+    self.sshuttle_path = [AppDelegate find_path_executables:@[@"/opt/homebrew/bin/sshuttle", @"/usr/local/bin/sshuttle"] withLabel:@"ssh"];
     
     NSString *prefsFilePath = [self getCustomPrefsFilePath];
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:prefsFilePath];
@@ -223,8 +248,8 @@
 - (void)startSSHProcess {
     self.autorestartSSH = YES;
     self.sshTask = [[NSTask alloc] init];
-    [self.sshTask setLaunchPath:@"/usr/bin/ssh"];
-    [self.sshTask setArguments:@[@"-N", @"-L", @"8022:localhost:8022", @"-i", @"/Users/andrea/.ssh/id_computing-server_bonn", @"computing-server2.iap.uni-bonn.de"]];
+    [self.sshTask setLaunchPath:[self ssh_path]];
+    [self.sshTask setArguments:@[@"-N", @"-L", @"8022:localhost:8022", @"-i", [@"~/.ssh/id_computing-server_bonn" stringByExpandingTildeInPath], @"computing-server2.iap.uni-bonn.de"]];
     
     // Redirect output and error to /dev/null
     NSFileHandle *nullFileHandle = [NSFileHandle fileHandleWithNullDevice];
@@ -267,7 +292,7 @@
 - (void)startSSHuttleProcess {
     self.autorestartSSHuttle = YES;
     self.sshuttleTask = [[NSTask alloc] init];
-    [self.sshuttleTask setLaunchPath:@"/usr/local/bin/sshuttle"];
+    [self.sshuttleTask setLaunchPath:[self sshuttle_path]];
     switch ([[self connType] intValue]) {
         case 0:
             [self.sshuttleTask setArguments:@[@"-r", @"m1-gateway", @"--dns", @"0/0"]];
@@ -324,6 +349,7 @@
         NSLog(@"SSHuttleBar: Terminate the ssh process (PID=%d)", [[self sshTask] processIdentifier]);
         [self.sshTask terminate];
         [self.sshTask waitUntilExit];
+        [self updateConnectionStatus];
     }
 }
 
@@ -334,11 +360,11 @@
         NSLog(@"SSHuttleBar: Terminate the sshuttle process (PID=%d)", [[self sshuttleTask] processIdentifier]);
         [self.sshuttleTask terminate];
         [self.sshuttleTask waitUntilExit];
+        [self updateConnectionStatus];
     }
 }
 
 - (void)updateConnectionStatus {
-    
     BOOL connected = [self isSSHuttleConnected] && ([self isSSHconnected] || ([[self connType] intValue] == 1));
     
     if (connected) {
