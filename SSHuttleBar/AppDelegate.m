@@ -82,13 +82,14 @@ static const int DirectConnection = 1;
     NSString *prefsFilePath = [self getCustomPrefsFilePath];
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:prefsFilePath];
     self.connectAfterLaunch = [([prefs objectForKey:@"connectAfterLaunch"] ? : @NO) boolValue];
-    self.connType = [([prefs objectForKey:@"connectType"] ? : [NSNumber numberWithInt:NoConnection]) intValue];
+    if(self.connectAfterLaunch){
+        self.connType = [([prefs objectForKey:@"connectType"] ? : [NSNumber numberWithInt:NoConnection]) intValue];
+    } else {
+        self.connType = NoConnection;
+    }
     
     self.lock = [[NSLock alloc] init];
     
-    //self.connectedIcon = @"⚡️"; // Connected state icon
-    //self.disconnectedIcon = @"❌"; // Disconnected state icon
-
     // Load the icons from the asset catalog
     self.connectedIcon = [NSImage imageNamed:@"ConnectedIcon"];
     self.disconnectedIcon = [NSImage imageNamed:@"DisconnectedIcon"];
