@@ -92,7 +92,9 @@ static const int DirectConnection = 1;
     
     // Load the icons from the asset catalog
     self.connectedIcon = [NSImage imageNamed:@"ConnectedIcon"];
+    [self.connectedIcon setTemplate:YES];
     self.disconnectedIcon = [NSImage imageNamed:@"DisconnectedIcon"];
+    [self.disconnectedIcon setTemplate:YES];
     
     // Initialize your status item here as before
     self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
