@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		653966332C03348800E3669F /* JSONParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 653966322C03348800E3669F /* JSONParser.m */; };
+		653966362C0334A400E3669F /* 1Password.m in Sources */ = {isa = PBXBuildFile; fileRef = 653966352C0334A400E3669F /* 1Password.m */; };
+		653966392C033EF400E3669F /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 653966372C033EF400E3669F /* Utils.m */; };
+		6539663B2C03473700E3669F /* sshuttle_expect.sh in Resources */ = {isa = PBXBuildFile; fileRef = 6539663A2C03473700E3669F /* sshuttle_expect.sh */; };
 		6575B52C2B78BA8E00F5206F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6575B52B2B78BA8E00F5206F /* AppDelegate.m */; };
 		6575B5312B78BA9000F5206F /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6575B52F2B78BA9000F5206F /* MainMenu.xib */; };
 		6575B5332B78BA9000F5206F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6575B5322B78BA9000F5206F /* main.m */; };
@@ -15,6 +19,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		653966312C03348800E3669F /* JSONParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSONParser.h; path = SSHuttleBar/JSONParser.h; sourceTree = SOURCE_ROOT; };
+		653966322C03348800E3669F /* JSONParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JSONParser.m; path = SSHuttleBar/JSONParser.m; sourceTree = SOURCE_ROOT; };
+		653966342C0334A400E3669F /* 1Password.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = 1Password.h; path = SSHuttleBar/1Password.h; sourceTree = SOURCE_ROOT; };
+		653966352C0334A400E3669F /* 1Password.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = 1Password.m; path = SSHuttleBar/1Password.m; sourceTree = SOURCE_ROOT; };
+		653966372C033EF400E3669F /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
+		653966382C033EF400E3669F /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
+		6539663A2C03473700E3669F /* sshuttle_expect.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = sshuttle_expect.sh; sourceTree = "<group>"; };
 		6575B5272B78BA8E00F5206F /* SSHuttleBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SSHuttleBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6575B52A2B78BA8E00F5206F /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		6575B52B2B78BA8E00F5206F /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -41,6 +52,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6539663C2C03483100E3669F /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				6539663A2C03473700E3669F /* sshuttle_expect.sh */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		6575B51E2B78BA8E00F5206F = {
 			isa = PBXGroup;
 			children = (
@@ -60,11 +79,18 @@
 		6575B5292B78BA8E00F5206F /* SSHuttleBar */ = {
 			isa = PBXGroup;
 			children = (
+				6539663C2C03483100E3669F /* Resources */,
 				65BB28A82B7A06B10083DAF9 /* Graphics */,
 				65B62C142B79588500AD6549 /* CustomStatusBarView.h */,
 				65B62C152B79588500AD6549 /* CustomStatusBarView.m */,
 				6575B52A2B78BA8E00F5206F /* AppDelegate.h */,
 				6575B52B2B78BA8E00F5206F /* AppDelegate.m */,
+				653966342C0334A400E3669F /* 1Password.h */,
+				653966352C0334A400E3669F /* 1Password.m */,
+				653966312C03348800E3669F /* JSONParser.h */,
+				653966322C03348800E3669F /* JSONParser.m */,
+				653966382C033EF400E3669F /* Utils.h */,
+				653966372C033EF400E3669F /* Utils.m */,
 				6575B52F2B78BA9000F5206F /* MainMenu.xib */,
 				6575B5322B78BA9000F5206F /* main.m */,
 				6575B5342B78BA9000F5206F /* SSHuttleBar.entitlements */,
@@ -143,6 +169,7 @@
 			files = (
 				65B62C132B794E0B00AD6549 /* Media.xcassets in Resources */,
 				6575B5312B78BA9000F5206F /* MainMenu.xib in Resources */,
+				6539663B2C03473700E3669F /* sshuttle_expect.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -155,6 +182,9 @@
 			files = (
 				65B62C162B79588500AD6549 /* CustomStatusBarView.m in Sources */,
 				6575B5332B78BA9000F5206F /* main.m in Sources */,
+				653966362C0334A400E3669F /* 1Password.m in Sources */,
+				653966392C033EF400E3669F /* Utils.m in Sources */,
+				653966332C03348800E3669F /* JSONParser.m in Sources */,
 				6575B52C2B78BA8E00F5206F /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

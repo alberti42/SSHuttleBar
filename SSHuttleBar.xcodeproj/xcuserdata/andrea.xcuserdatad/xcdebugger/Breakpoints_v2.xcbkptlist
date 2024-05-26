@@ -132,8 +132,8 @@
             filePath = "SSHuttleBar/AppDelegate.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "149"
-            endingLineNumber = "149"
+            startingLineNumber = "141"
+            endingLineNumber = "141"
             landmarkName = "-selectSSHconnect:"
             landmarkType = "7">
          </BreakpointContent>
@@ -148,9 +148,9 @@
             filePath = "SSHuttleBar/AppDelegate.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "234"
-            endingLineNumber = "234"
-            landmarkName = "-startSSHuttleProcess"
+            startingLineNumber = "301"
+            endingLineNumber = "301"
+            landmarkName = "-startSSHuttleProcesss"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -164,9 +164,9 @@
             filePath = "SSHuttleBar/AppDelegate.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "233"
-            endingLineNumber = "233"
-            landmarkName = "-startSSHuttleProcess"
+            startingLineNumber = "300"
+            endingLineNumber = "300"
+            landmarkName = "-startSSHuttleProcesss"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -180,9 +180,9 @@
             filePath = "SSHuttleBar/AppDelegate.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "237"
-            endingLineNumber = "237"
-            landmarkName = "-startSSHuttleProcess"
+            startingLineNumber = "305"
+            endingLineNumber = "305"
+            landmarkName = "-startSSHuttleProcesss"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
