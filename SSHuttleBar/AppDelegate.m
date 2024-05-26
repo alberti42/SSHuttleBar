@@ -11,10 +11,9 @@
 #import "CustomStatusBarView.h"
 
 #define NUM_SECONDS_BETWEEN_REPS 1
-// #define DEBUG_OUTPUT_PROCESSES 0
 
 static const int NoConnection = -1;
-static const int SshConnection = 0;
+static const int BonnConnection = 0;
 static const int DirectConnection = 1;
 
 @interface AppDelegate ()
@@ -36,6 +35,7 @@ static const int DirectConnection = 1;
 @property (assign, nonatomic) NSMenuItem* menu_item_direct_conn;
 @property (assign, nonatomic) NSString* path_sshuttle;
 @property (assign, nonatomic) NSString* path_ssh;
+@property (assign, nonatomic) NSString* path_sudo;
 @end
 
 @implementation AppDelegate
@@ -78,6 +78,7 @@ static const int DirectConnection = 1;
     
     self.path_ssh = [AppDelegate find_path_executables:@[@"/opt/homebrew/bin/ssh", @"/usr/local/bin/ssh", @"/usr/bin/ssh"] withLabel:@"sshuttle"];
     self.path_sshuttle = [AppDelegate find_path_executables:@[@"/opt/homebrew/bin/sshuttle", @"/usr/local/bin/sshuttle"] withLabel:@"ssh"];
+    self.path_sudo = [AppDelegate find_path_executables:@[@"/usr/bin/sudo"] withLabel:@"sudo"];
     
     NSString *prefsFilePath = [self getCustomPrefsFilePath];
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:prefsFilePath];
@@ -116,10 +117,10 @@ static const int DirectConnection = 1;
 
 - (void)start_processes{
     switch([self connType]){
-        case 0:
+        case BonnConnection:
             [self startSSHProcess];
             NSLog(@"SSHuttleBar: Connected to the ssh process (PID=%d)", [[self sshTask] processIdentifier]);
-        case 1:
+        case DirectConnection:
             [self startSSHuttleProcess];
             NSLog(@"SSHuttleBar: Connected to the sshuttle process (PID=%d)", [[self sshuttleTask] processIdentifier]);
     }
@@ -133,10 +134,10 @@ static const int DirectConnection = 1;
     
     switch([self connType])
     {
-        case 0:
+        case BonnConnection:
             [[self menu_item_ssh_conn] setState:YES];
             break;
-        case 1:
+        case DirectConnection:
             [[self menu_item_direct_conn] setState:YES];
             break;
     }
@@ -166,7 +167,7 @@ static const int DirectConnection = 1;
     }
     
     if(!current_status_ssh){
-        [self setConnType:SshConnection];
+        [self setConnType:BonnConnection];
         [self start_processes];
     }
     else{
@@ -247,7 +248,7 @@ static const int DirectConnection = 1;
     [self.sshTask setLaunchPath:[self path_ssh]];
     [self.sshTask setArguments:@[@"-N", @"-L", @"8022:localhost:8022", @"-i", [@"~/.ssh/id_computing-server_bonn" stringByExpandingTildeInPath], @"computing-server2.iap.uni-bonn.de"]];
     
-#ifndef DEBUG_OUTPUT_PROCESSES
+#ifndef DEBUG
     // Redirect output and error to /dev/null
     NSFileHandle *nullFileHandle = [NSFileHandle fileHandleWithNullDevice];
     [self.sshTask setStandardOutput:nullFileHandle];
@@ -290,17 +291,17 @@ static const int DirectConnection = 1;
 - (void)startSSHuttleProcess {
     self.autorestartSSHuttle = YES;
     self.sshuttleTask = [[NSTask alloc] init];
-    [self.sshuttleTask setLaunchPath:[self path_sshuttle]];
+    [self.sshuttleTask setLaunchPath:[self path_sudo]];
     switch ([self connType]) {
         case 0:
-            [self.sshuttleTask setArguments:@[@"-r", @"m1-gateway", @"--dns", @"0/0"]];
+            [self.sshuttleTask setArguments:@[[self path_sshuttle], @"-e", @"ssh -F /Users/andrea/.ssh/config", @"-r", @"m1-gateway-bonn", @"--dns", @"0/0"]];
             break;
         case 1:
-            [self.sshuttleTask setArguments:@[@"-r", @"m1-gateway-local", @"--dns", @"0/0"]];
+            [self.sshuttleTask setArguments:@[[self path_sshuttle], @"-e", @"ssh -F /Users/andrea/.ssh/config", @"-r", @"m1-gateway-local", @"--dns", @"0/0"]];
             break;
     }
     
-#ifndef DEBUG_OUTPUT_PROCESSES
+#ifndef DEBUG
     // Redirect output and error to /dev/null
     NSFileHandle *nullFileHandle = [NSFileHandle fileHandleWithNullDevice];
     [self.sshuttleTask setStandardOutput:nullFileHandle];
@@ -317,7 +318,7 @@ static const int DirectConnection = 1;
             [strongSelf1 updateConnectionStatus];
             
             BOOL relaunch = false;
-            if([self connType] == 1){
+            if([self connType] == DirectConnection){
                 relaunch = true;
             }
             [strongSelf1.lock lock];
@@ -365,7 +366,7 @@ static const int DirectConnection = 1;
 }
 
 - (void)updateConnectionStatus {
-    BOOL connected = [self isSSHuttleConnected] && ([self isSSHconnected] || ([self connType] == 1));
+    BOOL connected = [self isSSHuttleConnected] && ([self isSSHconnected] || ([self connType] == DirectConnection));
     
     if (connected) {
         self.statusItem.button.image = self.connectedIcon; // Connected icon
