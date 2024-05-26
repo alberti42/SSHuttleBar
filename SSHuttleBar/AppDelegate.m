@@ -107,7 +107,7 @@ static const int DirectConnection = 1;
 - (void)setupStatusItemMenu {
     NSMenu *menu = [[NSMenu alloc] init];
     
-    self.menu_item_ssh_conn = [menu addItemWithTitle:@"Connect through SSH" action:@selector(selectSSHconnect:) keyEquivalent:@"0"];
+    self.menu_item_ssh_conn = [menu addItemWithTitle:@"Connect through proxy" action:@selector(selectProxyConnect:) keyEquivalent:@"0"];
     self.menu_item_direct_conn = [menu addItemWithTitle:@"Connect directly" action:@selector(selectDirectConnect:) keyEquivalent:@"1"];
     
     switch([self connType])
@@ -136,7 +136,7 @@ static const int DirectConnection = 1;
     [NSApp terminate:nil];
 }
 
-- (void) selectSSHconnect:(NSMenuItem*)menuItem {
+- (void) selectProxyConnect:(NSMenuItem*)menuItem {
     
     BOOL current_status_ssh = [[self menu_item_ssh_conn] state];
     BOOL current_status_direct = [[self menu_item_direct_conn] state];

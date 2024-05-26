@@ -134,7 +134,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "141"
             endingLineNumber = "141"
-            landmarkName = "-selectSSHconnect:"
+            landmarkName = "-selectProxyConnect:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
