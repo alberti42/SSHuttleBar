@@ -36,10 +36,10 @@ NSString* path_op = nil;
     NSString *errorString = [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
 
 #ifdef DEBUG
-    //NSLog(@"Output: %@", outputString);
-    //NSLog(@"Error: %@", errorString);
+    // NSLog(@"Output: %@", outputString);
+    // NSLog(@"Error: %@", errorString);
 #endif
-    
+
     if (errorString.length > 0) {
         return nil; // or handle the error appropriately
     }
@@ -47,33 +47,37 @@ NSString* path_op = nil;
     return outputString;
 }
 
-+(NSDictionary<NSString *, NSString *> *)getCredentialsForId:(NSString *)theId {
-    if(!path_op) {
++ (NSDictionary<NSString *, NSString *> *)getCredentialsForId:(NSString *)theId {
+    if (!path_op) {
         path_op = [Utils find_path_executables:@[@"/usr/local/bin/op"] withLabel:@"op"];
     }
-    
+
     NSString *theOutput = [OnePasswordInterface executeShellCommandWithPath:path_op
                                                                andArguments:@[@"item", @"get", theId, @"--format", @"json"]];
-    
+
     if (theOutput == nil) {
         NSLog(@"Failed to execute shell command");
         return nil;
     }
-    
+
     NSDictionary *resultQuery = [JSONParser parseJSONString:theOutput];
-    
+
     if (resultQuery == nil) {
         NSLog(@"Failed to parse JSON string");
         return nil;
     }
-    
+
     NSArray *fields = resultQuery[@"fields"];
-    
-    if (fields.count > 8) {
-        NSString *theUsername = fields[1][@"value"];
-        NSString *thePassword = fields[2][@"value"];
-        NSString *theOTP = fields[8][@"totp"];
-        
+
+    NSDictionary *usernameField = [OnePasswordInterface findField:fields withKey:@"id" equalToValue:@"username"];
+    NSDictionary *passwordField = [OnePasswordInterface findField:fields withKey:@"id" equalToValue:@"password"];
+    NSDictionary *otpField = [OnePasswordInterface findField:fields withKey:@"type" equalToValue:@"OTP"];
+
+    if (usernameField && passwordField && otpField) {
+        NSString *theUsername = usernameField[@"value"];
+        NSString *thePassword = passwordField[@"value"];
+        NSString *theOTP = otpField[@"totp"];
+
 #ifdef DEBUG
         NSLog(@"Username: %@", theUsername);
         NSLog(@"Password: %@", thePassword);
@@ -88,8 +92,15 @@ NSString* path_op = nil;
         NSLog(@"Unexpected JSON structure");
         return nil;
     }
-    
-    
+}
+
++ (NSDictionary *)findField:(NSArray *)fields withKey:(NSString *)theField equalToValue:(NSString *)theFieldValue {
+    for (NSDictionary *field in fields) {
+        if ([field[theField] isEqualToString:theFieldValue]) {
+            return field;
+        }
+    }
+    return nil;
 }
 
 @end
