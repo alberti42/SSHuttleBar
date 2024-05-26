@@ -35,6 +35,7 @@ static const int DirectConnection = 1;
 @property (assign, nonatomic) NSString* path_sshuttle;
 @property (assign, nonatomic) NSString* path_sudo;
 @property (assign, nonatomic) NSString* path_ssh;
+@property (assign, nonatomic) NSString* path_expect;
 @end
 
 @implementation AppDelegate
@@ -48,8 +49,6 @@ static const int DirectConnection = 1;
     return prefsFilePath;
 }
 
-
-
 - (void)terminate_processes {
     [self terminateSSHuttleProcess];
 }
@@ -62,7 +61,8 @@ static const int DirectConnection = 1;
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     self.path_sshuttle = [Utils find_path_executables:@[@"/opt/homebrew/bin/sshuttle", @"/usr/local/bin/sshuttle"] withLabel:@"ssh"];
     self.path_sudo = [Utils find_path_executables:@[@"/usr/bin/sudo"] withLabel:@"sudo"];
-    self.path_ssh = [Utils find_path_executables:@[@"/usr/local/bin/ssh",@"/opt/homebrew/bin/ssh"] withLabel:@"sudo"];
+    self.path_ssh = [Utils find_path_executables:@[@"/usr/local/bin/ssh",@"/opt/homebrew/bin/ssh"] withLabel:@"ssh"];
+    self.path_expect = [Utils find_path_executables:@[@"/usr/bin/expect"] withLabel:@"expect"];
     
     NSString *prefsFilePath = [self getCustomPrefsFilePath];
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:prefsFilePath];
@@ -225,55 +225,73 @@ static const int DirectConnection = 1;
 - (void)startSSHuttleProcess {
     self.autorestartSSHuttle = YES;
     self.sshuttleTask = [[NSTask alloc] init];
-    
-    if([self connType]==ProxyConnection) {
+
+    if ([self connType] == ProxyConnection) {
         NSDictionary* theCredentials = [OnePasswordInterface getCredentialsForId:@"cmox6bkra5dv3gq3ggzz4ct4ay"];
         if (!theCredentials) {
             NSLog(@"Failed to get credentials");
             return;
         }
-        NSLog(@"%@", theCredentials);
-        
+#ifdef DEBUG
+        NSLog(@"Credentials: %@", theCredentials);
+#endif
+
         // Get the path to the sshuttle_expect.sh script in the app bundle
         NSString* expectScriptPath = [[NSBundle mainBundle] pathForResource:@"sshuttle_expect" ofType:@"sh"];
         if (!expectScriptPath) {
             NSLog(@"Failed to find sshuttle_expect.sh script in bundle");
             return;
         }
-        
+#ifdef DEBUG
+        NSLog(@"Expect script path: %@", expectScriptPath);
+#endif
         // Use the expect script to handle the password and OTP prompts
         [self.sshuttleTask setLaunchPath:@"/usr/bin/expect"];
-        [self.sshuttleTask setArguments:@[
-            expectScriptPath,
-            theCredentials[@"password"],
-            theCredentials[@"otp"],
-            self.path_sshuttle
-        ]];
-    } else if([self connType]==DirectConnection) {
-        
+        NSArray *arguments = @[expectScriptPath, theCredentials[@"password"], theCredentials[@"otp"], self.path_sshuttle];
+        [self.sshuttleTask setArguments:arguments];
+#ifdef DEBUG
+        NSLog(@"sshuttle task arguments: %@", arguments);
+#endif
+    } else if ([self connType] == DirectConnection) {
         [self.sshuttleTask setLaunchPath:self.path_sudo];
         NSString *directSshCommand = [NSString stringWithFormat:@"%@ -F /Users/andrea/.ssh/config", [self path_ssh]];
-        [self.sshuttleTask setArguments:@[
-            self.path_sshuttle,
-            @"-e",
-            directSshCommand,
-            @"-r",
-            @"m1-gateway-local",
-            @"--dns",
-            @"0/0"
-        ]];
+        NSArray *arguments = @[self.path_sshuttle, @"-e", directSshCommand, @"-r", @"m1-gateway-local", @"--dns", @"0/0"];
+        [self.sshuttleTask setArguments:arguments];
+#ifdef DEBUG
+        NSLog(@"Direct connection task arguments: %@", arguments);
+#endif
     }
 
-#ifndef DEBUG
+#ifdef DEBUG
+    // Redirect output and error to capture and log them
+    NSPipe *outputPipe = [NSPipe pipe];
+    NSPipe *errorPipe = [NSPipe pipe];
+    [self.sshuttleTask setStandardOutput:outputPipe];
+    [self.sshuttleTask setStandardError:errorPipe];
+
+    NSFileHandle *outputFile = [outputPipe fileHandleForReading];
+    NSFileHandle *errorFile = [errorPipe fileHandleForReading];
+#else
     // Redirect output and error to /dev/null
     NSFileHandle *nullFileHandle = [NSFileHandle fileHandleWithNullDevice];
     [self.sshuttleTask setStandardOutput:nullFileHandle];
     [self.sshuttleTask setStandardError:nullFileHandle];
 #endif
-
+    
     // Handle ssh task termination
     __weak typeof(self) weakSelf = self;
     [self.sshuttleTask setTerminationHandler:^(NSTask *task) {
+#ifdef DEBUG
+        NSData *outputData = [outputFile readDataToEndOfFile];
+        NSData *errorData = [errorFile readDataToEndOfFile];
+
+        NSString *outputString = [[NSString alloc] initWithData:outputData encoding:NSUTF8StringEncoding];
+        NSString *errorString = [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
+
+        NSLog(@"sshuttle output: %@", outputString);
+        NSLog(@"sshuttle error: %@", errorString);
+#endif
+
         dispatch_async(dispatch_get_main_queue(), ^{
             NSLog(@"SSHuttleBar: Lost sshuttle connection (PID=%d)", [task processIdentifier]);
             __strong typeof(weakSelf) strongSelf1 = weakSelf;
@@ -291,60 +309,20 @@ static const int DirectConnection = 1;
         });
     }];
 
-    // Start the ssh process
-    [self.sshuttleTask launch];
-    self.statusItem.button.image = self.connectedIcon;
-}
-
-
-- (void)startSSHuttleProcesss {
-    self.autorestartSSHuttle = YES;
-    self.sshuttleTask = [[NSTask alloc] init];
-    [self.sshuttleTask setLaunchPath:[self path_sudo]];
-    NSDictionary* theCredentials;
-    switch ([self connType]) {
-        case 0:
-            theCredentials=[OnePasswordInterface getCredentialsForId:@"cmox6bkra5dv3gq3ggzz4ct4ay"];
-            NSLog(@"%@",theCredentials);
-            [self.sshuttleTask setArguments:@[[self path_sshuttle], @"-e", @"ssh -F /Users/andrea/.ssh/config", @"-r", @"m1-gateway-mpcdf", @"--dns", @"0/0"]];
-            break;
-        case 1:
-            [self.sshuttleTask setArguments:@[[self path_sshuttle], @"-e", @"ssh -F /Users/andrea/.ssh/config", @"-r", @"m1-gateway-local", @"--dns", @"0/0"]];
-            break;
-    }
-    
-#ifndef DEBUG
-    // Redirect output and error to /dev/null
-    NSFileHandle *nullFileHandle = [NSFileHandle fileHandleWithNullDevice];
-    [self.sshuttleTask setStandardOutput:nullFileHandle];
-    [self.sshuttleTask setStandardError:nullFileHandle];
+#ifdef DEBUG
+    NSLog(@"Ready to start sshuttle");
 #endif
-    
-    // Handle ssh task termination
-    __weak typeof(self) weakSelf = self;
-    [self.sshuttleTask setTerminationHandler:^(NSTask *task) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSLog(@"SSHuttleBar: Lost sshuttle connection (PID=%d)", [task processIdentifier]);
-            __strong typeof(weakSelf) strongSelf1 = weakSelf;
-            strongSelf1.isSSHuttleConnected = NO;
-            [strongSelf1 updateConnectionStatus];
-            
-            if ([strongSelf1 autorestartSSHuttle]) {
-                // Wait for 1 second before trying to restart the SSH process
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(NUM_SECONDS_BETWEEN_REPS * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    __strong typeof(weakSelf) strongSelf2 = weakSelf;
-                    [strongSelf2 startSSHuttleProcess];
-                    NSLog(@"SSHuttleBar: Reconnected to the sshuttle process (PID=%d)", [[strongSelf2 sshuttleTask] processIdentifier]);
-                });
-            }
-            
-        });
-    }];
-    
     // Start the ssh process
-    [self.sshuttleTask launch];
-    self.statusItem.button.image = self.connectedIcon;
+    @try {
+        [self.sshuttleTask launch];
+        NSLog(@"sshuttle task launched successfully");
+        self.statusItem.button.image = self.connectedIcon;
+    }
+    @catch (NSException *exception) {
+        NSLog(@"Failed to launch sshuttle task: %@", exception);
+    }
 }
+
 
 - (void)terminateSSHuttleProcess {
     self.autorestartSSHuttle = NO;

@@ -8,7 +8,9 @@
     
     for (NSString *path in possiblePaths) {
         if ([fileManager fileExistsAtPath:path]) {
+#ifdef DEBUG
             NSLog(@"Found %@ executable at: %@", label, path);
+#endif
             return path;
         }
     }
