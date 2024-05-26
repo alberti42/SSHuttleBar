@@ -132,25 +132,9 @@
             filePath = "SSHuttleBar/AppDelegate.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "161"
-            endingLineNumber = "161"
+            startingLineNumber = "149"
+            endingLineNumber = "149"
             landmarkName = "-selectSSHconnect:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "0EBAB38F-E9DF-4FA6-99B4-4D89249DEEF0"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "SSHuttleBar/AppDelegate.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "119"
-            endingLineNumber = "119"
-            landmarkName = "-start_processes"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -164,8 +148,8 @@
             filePath = "SSHuttleBar/AppDelegate.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "292"
-            endingLineNumber = "292"
+            startingLineNumber = "234"
+            endingLineNumber = "234"
             landmarkName = "-startSSHuttleProcess"
             landmarkType = "7">
          </BreakpointContent>
@@ -180,8 +164,8 @@
             filePath = "SSHuttleBar/AppDelegate.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "291"
-            endingLineNumber = "291"
+            startingLineNumber = "233"
+            endingLineNumber = "233"
             landmarkName = "-startSSHuttleProcess"
             landmarkType = "7">
          </BreakpointContent>
@@ -196,8 +180,8 @@
             filePath = "SSHuttleBar/AppDelegate.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "295"
-            endingLineNumber = "295"
+            startingLineNumber = "237"
+            endingLineNumber = "237"
             landmarkName = "-startSSHuttleProcess"
             landmarkType = "7">
          </BreakpointContent>

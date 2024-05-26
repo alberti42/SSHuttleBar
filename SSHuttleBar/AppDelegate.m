@@ -18,15 +18,12 @@ static const int DirectConnection = 1;
 
 @interface AppDelegate ()
 @property (strong, nonatomic) NSStatusItem *statusItem;
-@property (strong, nonatomic) NSTask *sshTask;
 @property (strong, nonatomic) NSTask *sshuttleTask;
-@property (assign, nonatomic) BOOL isSSHconnected;
 @property (assign, nonatomic) BOOL isSSHuttleConnected;
 @property (strong, nonatomic) NSImage *connectedIcon;
 @property (strong, nonatomic) NSImage *disconnectedIcon;
 @property (strong, nonatomic) NSURL *bookmarkURL; // Property to store the bookmark URL
 @property (assign, nonatomic) BOOL autorestartSSHuttle;
-@property (assign, nonatomic) BOOL autorestartSSH;
 @property (strong, nonatomic) NSLock *lock;
 @property (strong, nonatomic) dispatch_semaphore_t finishedThreadCycled;
 @property (assign, nonatomic) BOOL connectAfterLaunch;
@@ -34,7 +31,6 @@ static const int DirectConnection = 1;
 @property (assign, nonatomic) NSMenuItem* menu_item_ssh_conn;
 @property (assign, nonatomic) NSMenuItem* menu_item_direct_conn;
 @property (assign, nonatomic) NSString* path_sshuttle;
-@property (assign, nonatomic) NSString* path_ssh;
 @property (assign, nonatomic) NSString* path_sudo;
 @end
 
@@ -66,7 +62,6 @@ static const int DirectConnection = 1;
 
 - (void)terminate_processes {
     [self terminateSSHuttleProcess];
-    [self terminateSSHprocess];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
@@ -76,7 +71,6 @@ static const int DirectConnection = 1;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     
-    self.path_ssh = [AppDelegate find_path_executables:@[@"/opt/homebrew/bin/ssh", @"/usr/local/bin/ssh", @"/usr/bin/ssh"] withLabel:@"sshuttle"];
     self.path_sshuttle = [AppDelegate find_path_executables:@[@"/opt/homebrew/bin/sshuttle", @"/usr/local/bin/sshuttle"] withLabel:@"ssh"];
     self.path_sudo = [AppDelegate find_path_executables:@[@"/usr/bin/sudo"] withLabel:@"sudo"];
     
@@ -116,14 +110,8 @@ static const int DirectConnection = 1;
 }
 
 - (void)start_processes{
-    switch([self connType]){
-        case BonnConnection:
-            [self startSSHProcess];
-            NSLog(@"SSHuttleBar: Connected to the ssh process (PID=%d)", [[self sshTask] processIdentifier]);
-        case DirectConnection:
-            [self startSSHuttleProcess];
-            NSLog(@"SSHuttleBar: Connected to the sshuttle process (PID=%d)", [[self sshuttleTask] processIdentifier]);
-    }
+    [self startSSHuttleProcess];
+    NSLog(@"SSHuttleBar: Connected to the sshuttle process (PID=%d)", [[self sshuttleTask] processIdentifier]);
 }
 
 - (void)setupStatusItemMenu {
@@ -242,52 +230,6 @@ static const int DirectConnection = 1;
     }
 }
 
-- (void)startSSHProcess {
-    self.autorestartSSH = YES;
-    self.sshTask = [[NSTask alloc] init];
-    [self.sshTask setLaunchPath:[self path_ssh]];
-    [self.sshTask setArguments:@[@"-N", @"-L", @"8022:localhost:8022", @"-i", [@"~/.ssh/id_computing-server_bonn" stringByExpandingTildeInPath], @"computing-server2.iap.uni-bonn.de"]];
-    
-#ifndef DEBUG
-    // Redirect output and error to /dev/null
-    NSFileHandle *nullFileHandle = [NSFileHandle fileHandleWithNullDevice];
-    [self.sshTask setStandardOutput:nullFileHandle];
-    [self.sshTask setStandardError:nullFileHandle];
-#endif
-    
-    // Handle ssh task termination
-    __weak typeof(self) weakSelf = self;
-    
-    [self.sshTask setTerminationHandler:^(NSTask *task) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSLog(@"SSHuttleBar: Lost ssh connection (PID=%d)", [task processIdentifier]);
-            __strong typeof(weakSelf) strongSelf1 = weakSelf;
-            strongSelf1.isSSHconnected = NO;
-            [strongSelf1 updateConnectionStatus];
-            
-            if ([strongSelf1 autorestartSSH]) {
-                // Wait for 1 second before trying to restart the SSH process
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(NUM_SECONDS_BETWEEN_REPS * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    __strong typeof(weakSelf) strongSelf2 = weakSelf;
-                    [strongSelf2 setAutorestartSSHuttle:NO];
-                    [strongSelf2 terminateSSHuttleProcess];
-                    
-                    [strongSelf2 startSSHProcess];
-                    NSLog(@"SSHuttleBar: Reconnected to the ssh process (PID=%d)", [[strongSelf2 sshTask] processIdentifier]);
-                    
-                    [strongSelf2 setAutorestartSSHuttle:YES];
-                    [strongSelf2 startSSHuttleProcess];
-                    NSLog(@"SSHuttleBar: Reconnected to the sshuttle process (PID=%d)", [[strongSelf2 sshuttleTask] processIdentifier]);
-                });
-            };
-        });
-    }];
-    
-    // Start the ssh process
-    [self.sshTask launch];
-    self.statusItem.button.image = self.connectedIcon;
-}
-
 - (void)startSSHuttleProcess {
     self.autorestartSSHuttle = YES;
     self.sshuttleTask = [[NSTask alloc] init];
@@ -317,21 +259,12 @@ static const int DirectConnection = 1;
             strongSelf1.isSSHuttleConnected = NO;
             [strongSelf1 updateConnectionStatus];
             
-            BOOL relaunch = false;
-            if([self connType] == DirectConnection){
-                relaunch = true;
-            }
-            [strongSelf1.lock lock];
-            if ([strongSelf1.sshTask isRunning]) {
-                relaunch = true;
-            }
-            [strongSelf1.lock unlock];
-            if (relaunch && [strongSelf1 autorestartSSHuttle]) {
+            if ([strongSelf1 autorestartSSHuttle]) {
                 // Wait for 1 second before trying to restart the SSH process
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(NUM_SECONDS_BETWEEN_REPS * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     __strong typeof(weakSelf) strongSelf2 = weakSelf;
                     [strongSelf2 startSSHuttleProcess];
-                    NSLog(@"SSHuttleBar: Reconnected to the sshuttle process (PID=%d)", [[strongSelf2 sshTask] processIdentifier]);
+                    NSLog(@"SSHuttleBar: Reconnected to the sshuttle process (PID=%d)", [[strongSelf2 sshuttleTask] processIdentifier]);
                 });
             }
             
@@ -341,17 +274,6 @@ static const int DirectConnection = 1;
     // Start the ssh process
     [self.sshuttleTask launch];
     self.statusItem.button.image = self.connectedIcon;
-}
-
-- (void)terminateSSHprocess {
-    self.autorestartSSH = NO;
-    [self.sshTask setTerminationHandler:nil];
-    if ([self.sshTask isRunning]) {
-        NSLog(@"SSHuttleBar: Terminate the ssh process (PID=%d)", [[self sshTask] processIdentifier]);
-        [self.sshTask terminate];
-        [self.sshTask waitUntilExit];
-        [self updateConnectionStatus];
-    }
 }
 
 - (void)terminateSSHuttleProcess {
@@ -366,9 +288,7 @@ static const int DirectConnection = 1;
 }
 
 - (void)updateConnectionStatus {
-    BOOL connected = [self isSSHuttleConnected] && ([self isSSHconnected] || ([self connType] == DirectConnection));
-    
-    if (connected) {
+    if ([self isSSHuttleConnected]) {
         self.statusItem.button.image = self.connectedIcon; // Connected icon
     } else {
         self.statusItem.button.image = self.disconnectedIcon; // DisSSHconnected icon
